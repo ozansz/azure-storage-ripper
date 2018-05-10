@@ -1,6 +1,5 @@
 import sys
 import os
-import logging
 import json
 
 from azure.storage.blob.blockblobservice import BlockBlobService
@@ -24,13 +23,13 @@ if __name__ == "__main__":
     fileserver_download_path = os.path.abspath(".")
 
     if len(config["acc"]) == 0:
-        logging.error("No accounts found in config.json")
+        print("[!] No accounts found in config.json")
         sys.exit(1)
 
-    logging.info("%d accounts found." % len(config["acc"]))
+    print("[+] %d accounts found." % len(config["acc"]))
 
     for account in config["acc"]:
-        logging.info("Using account: %s" % account["account_name"])
+        print("[+] Using account: %s" % account["account_name"])
 
         os.chdir(fileserver_download_path)
         if not os.path.isdir(account["account_name"]):
@@ -43,7 +42,7 @@ if __name__ == "__main__":
         containers = get_container_names(blob_service)
 
         for bc in containers:
-            logging.info("  Switched to container: %s" % bc)
+            print("  => Switched to container: %s" % bc)
 
             os.chdir(container_download_path)
             if not os.path.isdir(bc):
@@ -56,7 +55,11 @@ if __name__ == "__main__":
 
             for bb in blobs:
                 if os.path.exists(os.path.join(dp, bb)):
-                    logging.debug("File %s already exists, passing." % bb)
+                    print("    <> File %s already exists, passing." % bb)
                     continue
-                logging.debug("Downloading blob %s to path %s" % (bb, dp))
+                print("    => Downloading blob %s to path %s" % (bb, dp))
                 blob_service.get_blob_to_path(bc, bb, os.path.join(dp, bb))
+
+            print("")
+
+        print("")
